@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Merged } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 
 function Piece({ position }) {
   const group = useRef();

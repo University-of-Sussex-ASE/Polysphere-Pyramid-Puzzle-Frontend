@@ -13,25 +13,25 @@ import Piece from "./components/Piece";
 import Mapping from "./mapping.json";
 
 const Polysphere = () => {
-  let initialPieces = {
-    initialPieces: [
-      {
-        symbol: "A",
-        pieceIndex: 0,
-        indices: [31, 32, 33, 36, 38],
-      },
-      {
-        symbol: "B",
-        pieceIndex: 1,
-        indices: [24, 9, 54, 29, 13],
-      },
-      {
-        symbol: "C",
-        pieceIndex: 2,
-        indices: [43, 37, 20, 6, 2],
-      },
-    ],
-  };
+  // let initialPieces = {
+  //   initialPieces: [
+  //     {
+  //       symbol: "A",
+  //       pieceIndex: 0,
+  //       indices: [31, 32, 33, 36, 38],
+  //     },
+  //     {
+  //       symbol: "B",
+  //       pieceIndex: 1,
+  //       indices: [24, 9, 54, 29, 13],
+  //     },
+  //     {
+  //       symbol: "C",
+  //       pieceIndex: 2,
+  //       indices: [43, 37, 20, 6, 2],
+  //     },
+  //   ],
+  // };
 
   const pieces = [
     {
@@ -407,10 +407,10 @@ const Polysphere = () => {
     },
   ];
 
-  const testPositions = [
+  const initialPyramid = [
     {
       symbol: "A",
-      color: "#e4240d",
+      color: "#808080",
       coordinates: [
         {
           x: 1,
@@ -436,7 +436,7 @@ const Polysphere = () => {
     },
     {
       symbol: "B",
-      color: "#ee69a3",
+      color: "#808080",
       coordinates: [
         {
           x: 2,
@@ -467,7 +467,7 @@ const Polysphere = () => {
     },
     {
       symbol: "C",
-      color: "#f5a4c8",
+      color: "#808080",
       coordinates: [
         {
           x: 3,
@@ -498,7 +498,7 @@ const Polysphere = () => {
     },
     {
       symbol: "D",
-      color: "#179ad9",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -529,7 +529,7 @@ const Polysphere = () => {
     },
     {
       symbol: "E",
-      color: "#fee83a",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -560,7 +560,7 @@ const Polysphere = () => {
     },
     {
       symbol: "F",
-      color: "#b96bae",
+      color: "#808080",
       coordinates: [
         {
           x: 3,
@@ -581,7 +581,7 @@ const Polysphere = () => {
     },
     {
       symbol: "G",
-      color: "#8e58a5",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -612,7 +612,7 @@ const Polysphere = () => {
     },
     {
       symbol: "H",
-      color: "#65bc68",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -643,7 +643,7 @@ const Polysphere = () => {
     },
     {
       symbol: "I",
-      color: "#f3742b",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -674,7 +674,7 @@ const Polysphere = () => {
     },
     {
       symbol: "J",
-      color: "#1b8841",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -700,7 +700,7 @@ const Polysphere = () => {
     },
     {
       symbol: "K",
-      color: "#edb02e",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -726,7 +726,7 @@ const Polysphere = () => {
     },
     {
       symbol: "L",
-      color: "#89c8ec",
+      color: "#808080",
       coordinates: [
         {
           x: 0,
@@ -761,7 +761,10 @@ const Polysphere = () => {
   const [steps, setSteps] = useState(0);
   const [totalSolutions, setTotalSolutions] = useState(0);
   const [solutions, setSolutions] = useState([]);
-  const [currentSolution, setCurrentSolution] = useState(testPositions);
+  const [currentSolution, setCurrentSolution] = useState(initialPyramid);
+  const [selectedLevel, setSelectedLevel] = useState("");
+
+  const [initialPieces, setInitialPieces] = useState([]);
 
   const handleNext = () => {
     if (count <= 3) setCount(count + 1);
@@ -786,15 +789,30 @@ const Polysphere = () => {
   };
 
   const handleSolve = () => {
-    //handle API call to solve
+    let initialPiecesLoaded = "";
+    if (initialPieces.length > 0) {
+      initialPiecesLoaded = { initialPieces: initialPieces };
+    }
+
+    console.log(initialPiecesLoaded);
+
     setSteps(0);
     axios
-      .post("http://localhost:8010/pyramid/", initialPieces)
+      .post("http://localhost:8010/pyramid/", initialPiecesLoaded)
       .then((response) => {
         const solvedSolutions = response.data.data.solutions;
-        console.log("1 solutions", solvedSolutions[0]);
-        console.log("length", solvedSolutions.length);
+        console.log(11, response);
+
         setTotalSolutions(solvedSolutions.length);
+        console.log("solutions length ar", solvedSolutions.length);
+
+        if (solvedSolutions.length > 0) {
+          setCurrentSolution(solvedSolutions[0]);
+        } else {
+          console.log("impo sana hapa")
+          setCurrentSolution(initialPyramid); //set the pyramid to its initial shape
+          setInitialPieces([]); //remove all pieces from the initial pieces array
+        }
         setSolutions(solvedSolutions);
       })
       .catch((error) => {
@@ -802,10 +820,69 @@ const Polysphere = () => {
       });
   };
 
+  const handleRemoveShape = () => {
+    let currentPiece = pieces[count]
+    let symbol = currentPiece.symbol
+    let indices = currentPiece.indices
+
+    let obj = {
+      symbol: currentPiece.symbol,
+      pieceIndex: currentPiece.pieceIndex,
+      indices: indices,
+      color: "#808080", // grey it out
+      coordinates: currentPiece.coordinates,
+    };
+
+    setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+
+  };
+
+  const handleAddShape = () => {
+    let currentPiece = pieces[count];
+    let indices = [];
+    let coordinates = [];
+
+    if (selectedLevel !== "") {
+      Object.keys(Mapping).map((key) =>
+        Object.keys(Mapping[key]).map((newKey) => {
+          if (Mapping[key][newKey] == selectedLevel && newKey === "z") {
+            indices.push(parseInt(key));
+
+            // coordinates.push(Mapping[key]);
+          }
+        })
+      );
+    }
+
+    let obj = {
+      symbol: currentPiece.symbol,
+      pieceIndex: currentPiece.pieceIndex,
+      indices: indices,
+      color: currentPiece.color,
+      coordinates: currentPiece.coordinates,
+    };
+
+    setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+    setInitialPieces((initialPieces) => [...initialPieces, obj]);
+  };
+
+  const handleReset = () => {
+    setCurrentSolution(initialPyramid);
+    setTotalSolutions(0);
+  };
+
+  const handleNextvariation = () =>{
+
+  }
+
+  const handlePreviousvariation = () =>{
+    
+  }
+
   useEffect(() => {
     if (solutions.length > 0) {
-      console.log("fired");
       setCurrentSolution(solutions[steps]);
+      console.log(currentSolution);
     }
   }, [steps]);
 
@@ -814,6 +891,7 @@ const Polysphere = () => {
       <Row>
         <Col style={{ marginTop: "1%", marginLeft: "2%" }} md={6}>
           <Card style={{ background: "black" }}>
+            {/* <h2 style={{color:"white"}}>Solution controls</h2> */}
             <Button type="primary" onClick={handlePreviousSolution}>
               Previous
             </Button>
@@ -837,9 +915,19 @@ const Polysphere = () => {
             >
               Solve
             </Button>
-            <h2 style={{ background: "white" }}>
+            <Button
+              onClick={handleReset}
+              type="primary"
+              style={{
+                marginLeft: "1%",
+                background: "red",
+              }}
+            >
+              Reset
+            </Button>
+            <h3 style={{ background: "white" }}>
               Solutions: {steps + 1} out of {totalSolutions}
-            </h2>
+            </h3>
           </Card>
         </Col>
 
@@ -870,16 +958,32 @@ const Polysphere = () => {
         <Col style={{ marginTop: "1%", marginLeft: "1%" }} md={6}>
           <Card style={{ background: "black" }}>
             <Row>
-              <Radio.Group buttonStyle="solid" style={{ marginLeft: "2%" }}>
-                <Radio.Button value="a">L1</Radio.Button>
-                <Radio.Button value="b">L2</Radio.Button>
-                <Radio.Button value="c">L3</Radio.Button>
-                <Radio.Button value="c">L4</Radio.Button>
-                <Radio.Button value="c">L5</Radio.Button>
-                {/* <Radio.Button value="c">L5</Radio.Button> */}
-              </Radio.Group>
+              <Button>Next Variation</Button>
+              <Button type="primary" style={{ marginLeft: "1%" }}>
+                Previous Variation
+              </Button>
+              {/* <Radio.Group buttonStyle="solid" style={{ marginLeft: "2%" }}>
+                <Radio.Button value="0" onClick={() => handleSelectLevel("0")}>
+                  L1
+                </Radio.Button>
+                <Radio.Button value="1" onClick={() => handleSelectLevel("1")}>
+                  L2
+                </Radio.Button>
+                <Radio.Button value="2" onClick={() => handleSelectLevel("2")}>
+                  L3
+                </Radio.Button>
+                <Radio.Button value="3" onClick={() => handleSelectLevel("3")}>
+                  L4
+                </Radio.Button>
+                <Radio.Button value="4" onClick={() => handleSelectLevel("4")}>
+                  L5
+                </Radio.Button>
+              </Radio.Group> */}
+            </Row>
 
+            <Row style={{ marginTop: "2%", marginLeft: "1%" }}>
               <Button
+                onClick={handleAddShape}
                 style={{
                   background: "gray",
                   color: "white",
@@ -887,7 +991,19 @@ const Polysphere = () => {
                   marginLeft: "1%",
                 }}
               >
-                Add
+                Add Shape
+              </Button>
+
+              <Button
+                onClick={handleRemoveShape}
+                style={{
+                  background: "red",
+                  color: "white",
+                  borderColor: "red",
+                  marginLeft: "1%",
+                }}
+              >
+                Remove Shape
               </Button>
             </Row>
           </Card>

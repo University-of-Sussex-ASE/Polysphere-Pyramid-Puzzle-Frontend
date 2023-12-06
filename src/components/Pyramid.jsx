@@ -9,7 +9,7 @@ function Pyramid({ positions }) {
   const arrangeSpheres = () => {
     return positions.map((position, index) =>
       position.coordinates.map((item, index) => (
-        <mesh key={index} position={[item.x, item.y, item.z]}>
+        <mesh key={index} position={[item.x - item.z*0.5, item.z*-1 + 3.6, item.y - item.z*0.5 ]}>
           <sphereGeometry args={[0.5, 32, 32, 32]} />
           <meshStandardMaterial color={position.color} />
         </mesh>
