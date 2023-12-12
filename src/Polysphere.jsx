@@ -488,6 +488,7 @@ const Polysphere = () => {
   };
 
   const handleButtonChange = (e) => {
+    handleReset()
     setLevel(e.target.value);
   };
 
@@ -507,6 +508,9 @@ const Polysphere = () => {
       (item) => item.color !== currentPiece.color
     );
 
+    console.log("level", level)
+    console.log("perm 2", limitFromLevel1)
+
     if (findIntersectingMembersStatus(obj, currentSolution)) {
       if (
         // limit level and borders
@@ -515,7 +519,7 @@ const Polysphere = () => {
         !restrictBorders(obj) &
         limitBorders
       ) {
-        console.log("permis", restrictLevel(obj));
+        
         setCurrentSolution((currentSolution) => [...currentSolution, obj]);
       } else if (
         // limit level only
@@ -593,7 +597,7 @@ const Polysphere = () => {
       restrictedIndices = generateNumbers(6, 14);
     } else if (level == 4) {
       restrictedIndices = generateNumbers(15, 30);
-    } else if (level === 5) {
+    } else if (level == 5) {
       restrictedIndices = generateNumbers(31, 55);
     }
 
