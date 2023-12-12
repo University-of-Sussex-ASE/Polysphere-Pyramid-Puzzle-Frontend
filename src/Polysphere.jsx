@@ -4,409 +4,19 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import { Physics, usePlane, useBox } from "@react-three/cannon";
 import Plane from "./components/Plane";
 import Pyramid from "./components/Pyramid";
+import Spinner from "./components/Spinner";
 import axios from "axios";
 
 import "./styles.css";
-import { Row, Col, Card, Button, Radio } from "antd";
+import { Row, Col, Card, Button, Radio, Checkbox } from "antd";
 import { StepBackwardOutlined, StepForwardOutlined } from "@ant-design/icons";
 import Piece from "./components/Piece";
 import Mapping from "./mapping.json";
+import PiecePlacement from "./piecePlacements.json";
+import { Alert } from "reactstrap";
+import { filter } from "lodash";
 
 const Polysphere = () => {
-  // let initialPieces = {
-  //   initialPieces: [
-  //     {
-  //       symbol: "A",
-  //       pieceIndex: 0,
-  //       indices: [31, 32, 33, 36, 38],
-  //     },
-  //     {
-  //       symbol: "B",
-  //       pieceIndex: 1,
-  //       indices: [24, 9, 54, 29, 13],
-  //     },
-  //     {
-  //       symbol: "C",
-  //       pieceIndex: 2,
-  //       indices: [43, 37, 20, 6, 2],
-  //     },
-  //   ],
-  // };
-
-  const pieces = [
-    {
-      pieceIndex: 0,
-      symbol: "A",
-      color: "#e4240d",
-      coordinates: [
-        {
-          x: 0,
-          y: 0,
-          z: 4,
-        },
-        {
-          x: 0,
-          y: 1,
-          z: 4,
-        },
-        {
-          x: 0,
-          y: 2,
-          z: 4,
-        },
-        {
-          x: 1,
-          y: 0,
-          z: 4,
-        },
-        {
-          x: 1,
-          y: 2,
-          z: 4,
-        },
-      ],
-      indices: [31, 32, 33, 36, 38],
-    },
-    {
-      pieceIndex: 1,
-      symbol: "B",
-      color: "#ee69a3",
-      coordinates: [
-        {
-          x: 1,
-          y: 0,
-          z: 2,
-        },
-        {
-          x: 2,
-          y: 1,
-          z: 2,
-        },
-        {
-          x: 2,
-          y: 1,
-          z: 3,
-        },
-        {
-          x: 3,
-          y: 2,
-          z: 3,
-        },
-        {
-          x: 4,
-          y: 3,
-          z: 4,
-        },
-      ],
-      indices: [24, 9, 54, 29, 13],
-    },
-    {
-      pieceIndex: 2,
-      symbol: "C",
-      color: "#f5a4c8",
-      coordinates: [
-        {
-          x: 0,
-          y: 0,
-          z: 1,
-        },
-        {
-          x: 0,
-          y: 0,
-          z: 2,
-        },
-        {
-          x: 1,
-          y: 1,
-          z: 3,
-        },
-        {
-          x: 1,
-          y: 1,
-          z: 4,
-        },
-        {
-          x: 2,
-          y: 2,
-          z: 4,
-        },
-      ],
-      indices: [43, 37, 20, 6, 2],
-    },
-    {
-      pieceIndex: 3,
-      symbol: "D",
-      color: "#179ad9",
-      coordinates: [
-        {
-          x: 2,
-          y: 4,
-          z: 4,
-        },
-        {
-          x: 3,
-          y: 3,
-          z: 4,
-        },
-        {
-          x: 3,
-          y: 4,
-          z: 4,
-        },
-        {
-          x: 4,
-          y: 4,
-          z: 4,
-        },
-      ],
-      indices: [49, 55, 50, 45],
-    },
-    {
-      pieceIndex: 4,
-      symbol: "E",
-      color: "#fee83a",
-      coordinates: [
-        {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
-        {
-          x: 1,
-          y: 1,
-          z: 1,
-        },
-        {
-          x: 2,
-          y: 2,
-          z: 2,
-        },
-        {
-          x: 2,
-          y: 2,
-          z: 3,
-        },
-        {
-          x: 3,
-          y: 3,
-          z: 3,
-        },
-      ],
-      indices: [25, 30, 14, 5, 1],
-    },
-    {
-      pieceIndex: 5,
-      symbol: "F",
-      color: "#b96bae",
-      coordinates: [
-        {
-          x: 0,
-          y: 3,
-          z: 4,
-        },
-        {
-          x: 0,
-          y: 4,
-          z: 4,
-        },
-        {
-          x: 1,
-          y: 3,
-          z: 4,
-        },
-        {
-          x: 1,
-          y: 4,
-          z: 4,
-        },
-        {
-          x: 2,
-          y: 3,
-          z: 4,
-        },
-      ],
-      indices: [40, 35, 44, 39, 34],
-    },
-    {
-      pieceIndex: 6,
-      symbol: "G",
-      color: "#8e58a5",
-      coordinates: [
-        {
-          x: 2,
-          y: 1,
-          z: 4,
-        },
-        {
-          x: 3,
-          y: 1,
-          z: 4,
-        },
-        {
-          x: 3,
-          y: 2,
-          z: 4,
-        },
-        {
-          x: 4,
-          y: 2,
-          z: 4,
-        },
-      ],
-      indices: [48, 53, 42, 47],
-    },
-    {
-      pieceIndex: 7,
-      symbol: "H",
-      color: "#65bc68",
-      coordinates: [
-        {
-          x: 2,
-          y: 0,
-          z: 4,
-        },
-        {
-          x: 3,
-          y: 0,
-          z: 4,
-        },
-        {
-          x: 4,
-          y: 0,
-          z: 4,
-        },
-        {
-          x: 4,
-          y: 1,
-          z: 4,
-        },
-      ],
-      indices: [51, 52, 46, 41],
-    },
-    {
-      pieceIndex: 8,
-      symbol: "I",
-      color: "#f3742b",
-      coordinates: [
-        {
-          x: 0,
-          y: 1,
-          z: 3,
-        },
-        {
-          x: 0,
-          y: 2,
-          z: 3,
-        },
-        {
-          x: 0,
-          y: 3,
-          z: 3,
-        },
-        {
-          x: 1,
-          y: 3,
-          z: 3,
-        },
-        {
-          x: 2,
-          y: 3,
-          z: 3,
-        },
-      ],
-      indices: [16, 17, 18, 22, 26],
-    },
-    {
-      pieceIndex: 9,
-      symbol: "J",
-      color: "#1b8841",
-      coordinates: [
-        {
-          x: 0,
-          y: 0,
-          z: 3,
-        },
-        {
-          x: 1,
-          y: 0,
-          z: 3,
-        },
-        {
-          x: 2,
-          y: 0,
-          z: 3,
-        },
-        {
-          x: 3,
-          y: 0,
-          z: 3,
-        },
-        {
-          x: 3,
-          y: 1,
-          z: 3,
-        },
-      ],
-      indices: [28, 27, 23, 19, 15],
-    },
-    {
-      pieceIndex: 10,
-      symbol: "K",
-      color: "#edb02e",
-      coordinates: [
-        {
-          x: 0,
-          y: 1,
-          z: 2,
-        },
-        {
-          x: 1,
-          y: 2,
-          z: 2,
-        },
-        {
-          x: 1,
-          y: 2,
-          z: 3,
-        },
-      ],
-      indices: [7, 21, 11],
-    },
-    {
-      pieceIndex: 11,
-      symbol: "L",
-      color: "#f5a4c8",
-      coordinates: [
-        {
-          x: 0,
-          y: 1,
-          z: 1,
-        },
-        {
-          x: 1,
-          y: 0,
-          z: 1,
-        },
-        {
-          x: 0,
-          y: 2,
-          z: 2,
-        },
-        {
-          x: 1,
-          y: 1,
-          z: 2,
-        },
-        {
-          x: 2,
-          y: 0,
-          z: 2,
-        },
-      ],
-      indices: [12, 4, 10, 3, 8],
-    },
-  ];
-
   const initialPyramid = [
     {
       symbol: "A",
@@ -433,6 +43,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
     {
       symbol: "B",
@@ -464,6 +75,7 @@ const Polysphere = () => {
           z: 3,
         },
       ],
+      indices: [],
     },
     {
       symbol: "C",
@@ -495,6 +107,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
     {
       symbol: "D",
@@ -526,6 +139,7 @@ const Polysphere = () => {
           z: 3,
         },
       ],
+      indices: [],
     },
     {
       symbol: "E",
@@ -557,6 +171,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
     {
       symbol: "F",
@@ -578,6 +193,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
     {
       symbol: "G",
@@ -609,6 +225,7 @@ const Polysphere = () => {
           z: 2,
         },
       ],
+      indices: [],
     },
     {
       symbol: "H",
@@ -640,6 +257,7 @@ const Polysphere = () => {
           z: 2,
         },
       ],
+      indices: [],
     },
     {
       symbol: "I",
@@ -671,6 +289,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
     {
       symbol: "J",
@@ -697,6 +316,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
     {
       symbol: "K",
@@ -723,6 +343,7 @@ const Polysphere = () => {
           z: 3,
         },
       ],
+      indices: [],
     },
     {
       symbol: "L",
@@ -754,6 +375,7 @@ const Polysphere = () => {
           z: 4,
         },
       ],
+      indices: [],
     },
   ];
 
@@ -762,26 +384,40 @@ const Polysphere = () => {
   const [totalSolutions, setTotalSolutions] = useState(0);
   const [solutions, setSolutions] = useState([]);
   const [currentSolution, setCurrentSolution] = useState(initialPyramid);
-  const [selectedLevel, setSelectedLevel] = useState("");
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [level, setLevel] = useState(4);
+
+  const [piecesCounter, setPiecesCounter] = useState(0);
+  const [piecesArray, setPiecesArray] = useState(PiecePlacement);
 
   const [initialPieces, setInitialPieces] = useState([]);
 
+  // Rules
+  const [limitFromLevel1, setLimitFromLevel1] = useState(false);
+  const [limitBorders, setLimitBorders] = useState(false);
+
   const handleNext = () => {
+    setPiecesCounter(0);
+    setError(false);
+
     if (count <= 3) setCount(count + 1);
 
     if (count === 4) setCount(0);
   };
 
   const handlePrevious = () => {
+    setPiecesCounter(0);
+    setError(false);
     if (count >= 1) setCount(count - 1);
   };
 
   const handleNextSolution = () => {
     if (steps + 1 <= totalSolutions - 1) setSteps(steps + 1);
 
-    if (totalSolutions === 0) {
-      handleSolve();
-    }
+    // if (totalSolutions === 0) {
+    //   handleSolve();
+    // }
   };
 
   const handlePreviousSolution = () => {
@@ -794,95 +430,227 @@ const Polysphere = () => {
       initialPiecesLoaded = { initialPieces: initialPieces };
     }
 
-    console.log(initialPiecesLoaded);
-
     setSteps(0);
+    setIsLoading(true);
     axios
       .post("http://localhost:8010/pyramid/", initialPiecesLoaded)
       .then((response) => {
         const solvedSolutions = response.data.data.solutions;
-        console.log(11, response);
-
         setTotalSolutions(solvedSolutions.length);
-        console.log("solutions length ar", solvedSolutions.length);
 
         if (solvedSolutions.length > 0) {
           setCurrentSolution(solvedSolutions[0]);
+          setSteps(1);
+          setIsLoading(false);
         } else {
-          console.log("impo sana hapa")
+          setError(true);
+          setTimeout(() => {
+            setError(false);
+          }, [2000]);
+
           setCurrentSolution(initialPyramid); //set the pyramid to its initial shape
           setInitialPieces([]); //remove all pieces from the initial pieces array
+          setIsLoading(false);
         }
         setSolutions(solvedSolutions);
       })
       .catch((error) => {
         console.log(error);
+        setIsLoading(false);
       });
   };
 
-  const handleRemoveShape = () => {
-    let currentPiece = pieces[count]
-    let symbol = currentPiece.symbol
-    let indices = currentPiece.indices
-
+  const handleRemoveShape = (currentPiece) => {
     let obj = {
-      symbol: currentPiece.symbol,
-      pieceIndex: currentPiece.pieceIndex,
-      indices: indices,
-      color: "#808080", // grey it out
+      symbol: currentPiece.shapeindex,
+      pieceIndex: currentPiece.blockIndex,
+      indices: currentPiece.indices,
+      color: "#808080",
       coordinates: currentPiece.coordinates,
     };
 
-    setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+    const filteredSoln = currentSolution.filter(
+      (item) =>
+        (item.indices !== currentPiece.indices) &
+        (currentPiece.color !== item.color)
+    );
 
+    setCurrentSolution(filteredSoln);
+    setCurrentSolution((solution) => [...solution, obj]);
   };
 
-  const handleAddShape = () => {
-    let currentPiece = pieces[count];
-    let indices = [];
-    let coordinates = [];
+  const handleLimitLevels = (e) => {
+    setLimitFromLevel1(e.target.checked);
+  };
 
-    if (selectedLevel !== "") {
-      Object.keys(Mapping).map((key) =>
-        Object.keys(Mapping[key]).map((newKey) => {
-          if (Mapping[key][newKey] == selectedLevel && newKey === "z") {
-            indices.push(parseInt(key));
+  const handleBorders = (e) => {
+    setLimitBorders(e.target.checked);
+  };
 
-            // coordinates.push(Mapping[key]);
-          }
-        })
-      );
-    }
+  const handleButtonChange = (e) => {
+    setLevel(e.target.value);
+  };
 
+  const handleAddShape = (currentPiece) => {
     let obj = {
-      symbol: currentPiece.symbol,
-      pieceIndex: currentPiece.pieceIndex,
-      indices: indices,
-      color: currentPiece.color,
-      coordinates: currentPiece.coordinates,
+      pieceIndex: piecesArray[count][piecesCounter].blockIndex,
+      indices: piecesArray[count][piecesCounter].indices,
+      color: piecesArray[count][piecesCounter].color,
+      coordinates: piecesArray[count][piecesCounter].coordinates,
     };
 
-    setCurrentSolution((currentSolution) => [...currentSolution, obj]);
-    setInitialPieces((initialPieces) => [...initialPieces, obj]);
+    const occupancyCheck = initialPieces.filter(
+      (item) => item.color === currentPiece.color
+    );
+
+    const filteredPieces = initialPieces.filter(
+      (item) => item.color !== currentPiece.color
+    );
+
+    if (findIntersectingMembersStatus(obj, currentSolution)) {
+      if (
+        // limit level and borders
+        limitFromLevel1 &
+        !restrictLevel(obj) &
+        !restrictBorders(obj) &
+        limitBorders
+      ) {
+        setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+      } else if (
+        // limit level only
+        limitFromLevel1 &
+        !restrictLevel(obj) &
+        !limitBorders
+      ) {
+        setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+      } else if (
+        // limit borders only
+        !limitFromLevel1 &
+        limitBorders &
+        !restrictBorders(obj)
+      ) {
+        setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+      } else if (!limitFromLevel1 && !limitBorders) {
+        // no limitations
+
+        setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+      }
+    }
+
+    if (occupancyCheck.length > 0) {
+      setInitialPieces(filteredPieces);
+      setInitialPieces((initialPieces) => [...initialPieces, obj]);
+    } else {
+      setInitialPieces([...initialPieces, obj]);
+    }
   };
 
   const handleReset = () => {
+    setSolutions([]);
+    setInitialPieces([]);
     setCurrentSolution(initialPyramid);
+
+    setError(false);
+    setSteps(0);
     setTotalSolutions(0);
   };
 
-  const handleNextvariation = () =>{
+  const handleNextvariation = () => {
+    let currentPiece = "";
 
-  }
+    if (piecesCounter > 0) {
+      currentPiece = piecesArray[count][piecesCounter - 1];
+    } else {
+      currentPiece = piecesArray[count][piecesCounter];
+    }
 
-  const handlePreviousvariation = () =>{
-    
-  }
+    if (findIntersectingMembersStatus(currentPiece, currentSolution)) {
+      handleRemoveShape(currentPiece);
+    }
+
+    setPiecesCounter(piecesCounter + 1);
+
+    handleAddShape(currentPiece);
+  };
+
+  const generateNumbers = (start, end) => {
+    const numbers = [];
+    for (let i = start; i <= end; i++) {
+      numbers.push(i);
+    }
+    return numbers;
+  };
+
+  const restrictLevel = (piece) => {
+    let restrictedIndices = [];
+
+    if (level == 1) {
+      restrictedIndices = [1];
+    } else if (level == 2) {
+      restrictedIndices = generateNumbers(2, 5);
+    } else if (level == 3) {
+      restrictedIndices = generateNumbers(6, 14);
+    } else if (level == 4) {
+      restrictedIndices = generateNumbers(15, 30);
+    } else if (level == 5) {
+      restrictedIndices = generateNumbers(31, 55);
+    }
+
+    return areMembersContained(restrictedIndices, piece.indices);
+  };
+
+  const restrictBorders = (piece) => {
+    let finalArray = [];
+    let restrictedIndices = [
+      6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18, 19, 22, 23, 26, 27, 28, 29, 30,
+      31, 32, 33, 34, 35, 36, 41, 46, 51, 52, 53, 54, 55, 50, 45, 40,
+    ];
+
+    restrictedIndices.filter((element) => {
+      if (piece.indices.includes(element)) {
+        finalArray.push(true); // false will say that the piece conflicts with the current soln
+      } else {
+        finalArray.push(false);
+      }
+    });
+
+    if (finalArray.includes(true)) {
+      return true;
+    } else return false;
+  };
+
+  const areMembersContained = (arr1, arr2) => {
+    return arr2.every((item) => arr1.includes(item));
+  };
+
+  const findIntersectingMembersStatus = (array2, currentSolution) => {
+    let finalArray = [];
+    currentSolution.map((item) => {
+      if (item.indices.length > 0) {
+        let array1 = item.indices;
+
+        array1.filter((element) => {
+          if (
+            array2.indices.includes(element) &
+            (item.color !== "#808080") &
+            (item.color !== array2.color)
+          ) {
+            finalArray.push(false); // false will say that the piece conflicts with the current soln
+          } else {
+            finalArray.push(true);
+          }
+        });
+      }
+    });
+
+    if (finalArray.includes(false)) {
+      return false;
+    } else return true;
+  };
 
   useEffect(() => {
     if (solutions.length > 0) {
       setCurrentSolution(solutions[steps]);
-      console.log(currentSolution);
     }
   }, [steps]);
 
@@ -925,86 +693,73 @@ const Polysphere = () => {
             >
               Reset
             </Button>
-            <h3 style={{ background: "white" }}>
-              Solutions: {steps + 1} out of {totalSolutions}
-            </h3>
+
+            {error ? (
+              <Alert color="danger" style={{ background: "red" }}>
+                <div>
+                  <h2>No solution found</h2>
+                </div>
+              </Alert>
+            ) : isLoading ? (
+              <Spinner />
+            ) : (
+              <h3 style={{ background: "white" }}>
+                Solutions: {steps + 1} out of {totalSolutions.toLocaleString()}
+              </h3>
+            )}
           </Card>
         </Col>
 
         <Col style={{ marginTop: "3%", marginLeft: "1%" }} md={1}>
-          <Button
-            onClick={handlePrevious}
-            icon={<StepBackwardOutlined />}
-          ></Button>
+          <Button onClick={handlePrevious} icon={<StepBackwardOutlined />}>
+            Previous Piece
+          </Button>
         </Col>
 
         <Col md={8}>
           <Canvas>
             <OrbitControls />
             <ambientLight intensity={0.5} />
-            {/* <spotLight position={[10, 15, 10]} angle={0.3} /> */}
+            <spotLight position={[10, 15, 10]} angle={0.3} />
             <Physics>
-              <Piece
-                position={pieces.filter((item) => item.pieceIndex === count)[0]}
-              />
+              <Piece position={piecesArray[count][piecesCounter]} />
             </Physics>
           </Canvas>
         </Col>
 
-        <Col style={{ marginTop: "3%", marginLeft: "1%" }} md={1}>
-          <Button onClick={handleNext} icon={<StepForwardOutlined />}></Button>
+        <Col style={{ marginTop: "3%" }} md={1}>
+          <Button onClick={handleNext} icon={<StepForwardOutlined />}>
+            Next Piece
+          </Button>
         </Col>
 
-        <Col style={{ marginTop: "1%", marginLeft: "1%" }} md={6}>
+        <Col style={{ marginTop: "1%", marginLeft: "10%" }} md={4}>
           <Card style={{ background: "black" }}>
+            <Button onClick={handleNextvariation}>Rotate piece</Button>
             <Row>
-              <Button>Next Variation</Button>
-              <Button type="primary" style={{ marginLeft: "1%" }}>
-                Previous Variation
-              </Button>
-              {/* <Radio.Group buttonStyle="solid" style={{ marginLeft: "2%" }}>
-                <Radio.Button value="0" onClick={() => handleSelectLevel("0")}>
-                  L1
-                </Radio.Button>
-                <Radio.Button value="1" onClick={() => handleSelectLevel("1")}>
-                  L2
-                </Radio.Button>
-                <Radio.Button value="2" onClick={() => handleSelectLevel("2")}>
-                  L3
-                </Radio.Button>
-                <Radio.Button value="3" onClick={() => handleSelectLevel("3")}>
-                  L4
-                </Radio.Button>
-                <Radio.Button value="4" onClick={() => handleSelectLevel("4")}>
-                  L5
-                </Radio.Button>
-              </Radio.Group> */}
+              <Checkbox
+                style={{ color: "white", marginTop: "2%" }}
+                onChange={handleLimitLevels}
+              >
+                Restrict Horizontal orientation on Level
+              </Checkbox>
+
+              <Radio.Group
+                onChange={handleButtonChange}
+                buttonStyle="solid"
+                defaultValue="5"
+              >
+                <Radio.Button value="1">1</Radio.Button>
+                <Radio.Button value="2">2</Radio.Button>
+                <Radio.Button value="3">3</Radio.Button>
+                <Radio.Button value="4">4</Radio.Button>
+                <Radio.Button value="5">5</Radio.Button>
+              </Radio.Group>
             </Row>
-
-            <Row style={{ marginTop: "2%", marginLeft: "1%" }}>
-              <Button
-                onClick={handleAddShape}
-                style={{
-                  background: "gray",
-                  color: "white",
-                  borderColor: "gray",
-                  marginLeft: "1%",
-                }}
-              >
-                Add Shape
-              </Button>
-
-              <Button
-                onClick={handleRemoveShape}
-                style={{
-                  background: "red",
-                  color: "white",
-                  borderColor: "red",
-                  marginLeft: "1%",
-                }}
-              >
-                Remove Shape
-              </Button>
+            <Row>
+              <Checkbox style={{ color: "white" }} onChange={handleBorders}>
+                Avoid Piece Touching Borders
+              </Checkbox>
             </Row>
           </Card>
         </Col>
