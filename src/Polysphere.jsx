@@ -386,7 +386,7 @@ const Polysphere = () => {
   const [currentSolution, setCurrentSolution] = useState(initialPyramid);
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [level, setLevel] = useState(4);
+  const [level, setLevel] = useState(5);
 
   const [piecesCounter, setPiecesCounter] = useState(0);
   const [piecesArray, setPiecesArray] = useState(PiecePlacement);
@@ -515,6 +515,7 @@ const Polysphere = () => {
         !restrictBorders(obj) &
         limitBorders
       ) {
+        console.log("permis", restrictLevel(obj));
         setCurrentSolution((currentSolution) => [...currentSolution, obj]);
       } else if (
         // limit level only
@@ -592,9 +593,12 @@ const Polysphere = () => {
       restrictedIndices = generateNumbers(6, 14);
     } else if (level == 4) {
       restrictedIndices = generateNumbers(15, 30);
-    } else if (level == 5) {
+    } else if (level === 5) {
       restrictedIndices = generateNumbers(31, 55);
     }
+
+    console.log("res indices", restrictedIndices);
+    console.log("piece indices", piece.indices);
 
     return areMembersContained(restrictedIndices, piece.indices);
   };
