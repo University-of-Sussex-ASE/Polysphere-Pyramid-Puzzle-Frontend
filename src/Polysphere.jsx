@@ -385,6 +385,7 @@ const Polysphere = () => {
   const [solutions, setSolutions] = useState([]);
   const [currentSolution, setCurrentSolution] = useState(initialPyramid);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [level, setLevel] = useState(5);
 
@@ -401,9 +402,9 @@ const Polysphere = () => {
     setPiecesCounter(0);
     setError(false);
 
-    if (count <= 3) setCount(count + 1);
+    if (count <= 10) setCount(count + 1);
 
-    if (count === 4) setCount(0);
+    if (count === 11) setCount(0);
   };
 
   const handlePrevious = () => {
@@ -443,6 +444,7 @@ const Polysphere = () => {
           setSteps(1);
           setIsLoading(false);
         } else {
+          setErrorMessage("No Solution found");
           setError(true);
           setTimeout(() => {
             setError(false);
@@ -488,7 +490,7 @@ const Polysphere = () => {
   };
 
   const handleButtonChange = (e) => {
-    handleReset()
+    handleReset();
     setLevel(e.target.value);
   };
 
@@ -508,9 +510,6 @@ const Polysphere = () => {
       (item) => item.color !== currentPiece.color
     );
 
-    console.log("level", level)
-    console.log("perm 2", limitFromLevel1)
-
     if (findIntersectingMembersStatus(obj, currentSolution)) {
       if (
         // limit level and borders
@@ -519,7 +518,6 @@ const Polysphere = () => {
         !restrictBorders(obj) &
         limitBorders
       ) {
-        
         setCurrentSolution((currentSolution) => [...currentSolution, obj]);
       } else if (
         // limit level only
@@ -539,7 +537,19 @@ const Polysphere = () => {
         // no limitations
 
         setCurrentSolution((currentSolution) => [...currentSolution, obj]);
+      } else {
+        setError(true);
+        setErrorMessage("Piece Position Restricted");
+        setTimeout(() => {
+          setError(false);
+        }, 2000);
       }
+    } else { // Trying this out
+      setError(true);
+      setErrorMessage("Piece Position Restricted");
+      setTimeout(() => {
+        setError(false);
+      }, 2000);
     }
 
     if (occupancyCheck.length > 0) {
@@ -600,9 +610,6 @@ const Polysphere = () => {
     } else if (level == 5) {
       restrictedIndices = generateNumbers(31, 55);
     }
-
-    console.log("res indices", restrictedIndices);
-    console.log("piece indices", piece.indices);
 
     return areMembersContained(restrictedIndices, piece.indices);
   };
@@ -705,7 +712,7 @@ const Polysphere = () => {
             {error ? (
               <Alert color="danger" style={{ background: "red" }}>
                 <div>
-                  <h2>No solution found</h2>
+                  <h2>{errorMessage}</h2>
                 </div>
               </Alert>
             ) : isLoading ? (
@@ -718,7 +725,10 @@ const Polysphere = () => {
           </Card>
         </Col>
 
-        <Col style={{ marginTop: "3%", marginLeft: "1%" }} md={1}>
+        <Col
+          style={{ marginTop: "3%", marginLeft: "1%", zIndex: 10000 }}
+          md={1}
+        >
           <Button onClick={handlePrevious} icon={<StepBackwardOutlined />}>
             Previous Piece
           </Button>
@@ -735,7 +745,7 @@ const Polysphere = () => {
           </Canvas>
         </Col>
 
-        <Col style={{ marginTop: "3%" }} md={1}>
+        <Col style={{ marginTop: "3%", zIndex: 10000 }} md={1}>
           <Button onClick={handleNext} icon={<StepForwardOutlined />}>
             Next Piece
           </Button>
